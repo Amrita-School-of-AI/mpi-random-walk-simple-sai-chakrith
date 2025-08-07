@@ -65,6 +65,30 @@ void walker_process()
     //       "Rank X: Walker finished in Y steps."
     //    b. Send an integer message to the controller (rank 0) to signal completion.
     //    c. Break the loop.
+
+    int position = 0;
+    int steps = 0;
+    while(steps<max_steps){
+        
+        if (rand()%2==0){
+            position = position - 1;
+        }else{
+            position = position + 1;
+        }
+        steps++;
+
+        if (position > domain_size || position < -domain_size){
+            std::cout<<"Rank" << world_rank << ": Walker finished in"<< steps << " steps(out of bounds)." << std::end1;
+        break;
+        }
+    }
+
+    if (steps == max_steps){
+        std::cout<<"Rank" << world_rank << ": Walker finished in"<< steps << " steps(max steps reached)"<< std::end1;
+    }
+
+    int msg = 1;
+    MPI_send(&msg, 1,MPI_INT,0,0,MPI_COMM_WORLD);
 }
 
 void controller_process()
@@ -76,4 +100,16 @@ void controller_process()
     //    a message from any walker that finishes.
     // 4. After receiving messages from all walkers, print a final summary message.
     //    For example: "Controller: All X walkers have finished."
+    int num_walkers = world_size - 1;
+    int finished = 0;
+
+    std::cout<<"Controller:Waiting for" << walkers<<"wakers to finish..."<< std::end1;
+
+    for(int i = 0; i<walkers;++I){
+        int msg;
+        MPI_Recv(&msg, 1, MPI_INT, MPI_ANY_SOURCE, 0, MPI_COMM_WORLD, &status);
+        std::cout<<"controller: Recieved completionfrom rank" << status.MPI_SOURCE<<std::end1;
+        finished++;
+    }
+    std::cout<<"Controller: All "<< walkers<<" walkers have finished."<< std::end1;
 }
