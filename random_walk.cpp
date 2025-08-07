@@ -65,9 +65,6 @@ void walker_process()
     //       "Rank X: Walker finished in Y steps."
     //    b. Send an integer message to the controller (rank 0) to signal completion.
     //    c. Break the loop.
-
-    void walker_process()
-{
     srand(time(NULL) + world_rank);
 
     int position = 0;
@@ -110,5 +107,4 @@ void controller_process()
     }
     
     std::cout << "Controller: All " << num_walkers << " walkers have finished." << std::endl;
-}
 }
